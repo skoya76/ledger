@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ladger/database/database_helper.dart';
 
 void main() {
   runApp(const MyApp());
