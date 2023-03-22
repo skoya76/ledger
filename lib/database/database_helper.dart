@@ -10,8 +10,7 @@ class LadgerDatabaseHelper {
   static final _databaseVersion = 1;
 
   static final table1 = 'ladger_table';
-  static final columnTransactionId =
-      'transactionId INTEGER PRIMARY KEY AUTOINCREMENT'; // カラム名：取引ID
+  static final columnTransactionId ='transactionId'; // カラム名：取引ID
   static final columnBalance = 'balance'; // カラム名：残高
   static final columnUser = 'user'; // カラム名：ユーザー名
   static final columnAction = 'action'; // カラム名：操作（0:spend, 1:add）
@@ -44,7 +43,7 @@ class LadgerDatabaseHelper {
   Future _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE $table1 (
-        $columnTransactionId INTEGER PRIMARY KEY,
+        $columnTransactionId INTEGER PRIMARY KEY AUTOINCREMENT,
         $columnBalance INTEGER NOT NULL CHECK ($columnBalance >= 0),
         $columnUser TEXT NOT NULL,
         $columnAction INTEGER NOT NULL CHECK ($columnAction IN (0, 1)),
