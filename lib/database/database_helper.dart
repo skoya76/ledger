@@ -54,9 +54,22 @@ class LadgerDatabaseHelper {
     ''');
   }
 
-  Future<int> insert(Map<String, dynamic> row) async {
-    Database? db = await instance.database;
-    return await db!.insert(table1, row);
+  Future<void> insertTransaction(
+      String user, int action, int amount, String date) async {
+    final db = await LadgerDatabaseHelper.instance.database;
+    final currentBalance = await LadgerDatabaseHelper.instance.getMaxTransactionBalance() ?? 0;
+
+    final newRow = <String, dynamic>{
+      LadgerDatabaseHelper.columnBalance: action == 0
+          ? currentBalance - amount
+          : currentBalance + amount,
+      LadgerDatabaseHelper.columnUser: user,
+      LadgerDatabaseHelper.columnAction: action,
+      LadgerDatabaseHelper.columnAmount: amount,
+      LadgerDatabaseHelper.columnDate: date,
+    };
+
+    await db?.insert(LadgerDatabaseHelper.table1, newRow);
   }
 
   Future<int?> getMaxTransactionBalance() async {
