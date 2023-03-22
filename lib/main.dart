@@ -33,38 +33,53 @@ class _MyHomePageState extends State<MyHomePage> {
   int _investmentPool = 0;
   int _inputValue = 0;
 
-  void _addToPool() async {
+  @override
+  void initState() {
+    super.initState();
+    _loadInvestmentPool();
+  }
 
-    await LadgerDatabaseHelper.instance.insert({
-      LadgerDatabaseHelper.columnTransactionId: DateTime.now().millisecondsSinceEpoch,
-      LadgerDatabaseHelper.columnUser: 'user',
-      LadgerDatabaseHelper.columnAction: 1,
-      LadgerDatabaseHelper.columnAmount: _inputValue,
-      LadgerDatabaseHelper.columnDate: DateTime.now().toString(),
-    });
-
+  Future<void> _loadInvestmentPool() async {
+    final balance = await LadgerDatabaseHelper.instance.getMaxTransactionBalance();
     setState(() {
-      _investmentPool += _inputValue;
+      _investmentPool = balance ?? 0;
+    });
+  }
+
+  void _addToPool() async {
+    final balance = await LadgerDatabaseHelper.instance.getMaxTransactionBalance() ?? 0;
+    final newBalance = balance + _inputValue;
+    await LadgerDatabaseHelper.instance.insertTransaction('user', 1, _inputValue, DateTime.now().toString());
+    setState(() {
+      _investmentPool = newBalance;
     });
   }
 
   void _consumeFromPool() async {
-
-    await LadgerDatabaseHelper.instance.insert({
-      LadgerDatabaseHelper.columnTransactionId: DateTime.now().millisecondsSinceEpoch,
-      LadgerDatabaseHelper.columnUser: 'user',
-      LadgerDatabaseHelper.columnAction: 0,
-      LadgerDatabaseHelper.columnAmount: _inputValue,
-      LadgerDatabaseHelper.columnDate: DateTime.now().toString(),
-    });
-
-    setState(() {
-      if (_investmentPool - _inputValue >= 0) {
+    final balance = await LadgerDatabaseHelper.instance.getMaxTransactionBalance() ?? 0;
+    if (_investmentPool >= _inputValue) {
+      final newBalance = balance - _inputValue;
+      await LadgerDatabaseHelper.instance.insertTransaction('user', 0, _inputValue, DateTime.now().toString());
+      setState(() {
         _investmentPool -= _inputValue;
-      } else {
-        _investmentPool = 0;
-      }
-    });
+      });
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Not enough balance in the investment pool.'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override

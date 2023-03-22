@@ -72,7 +72,7 @@ class LadgerDatabaseHelper {
     await db?.insert(LadgerDatabaseHelper.table1, newRow);
   }
 
-  Future<int?> getMaxTransactionBalance() async {
+  Future<int> getMaxTransactionBalance() async {
     Database? db = await instance.database;
     List<Map<String, dynamic>> result = await db!.query(table1,
         columns: [columnBalance],
@@ -80,7 +80,7 @@ class LadgerDatabaseHelper {
     if (result.isNotEmpty) {
       return result.first[columnBalance];
     } else {
-      return null;
+      return 0;
     }
   }
 }
