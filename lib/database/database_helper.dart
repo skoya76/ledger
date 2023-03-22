@@ -62,6 +62,14 @@ class LadgerDatabaseHelper {
     return await db!.query(table1);
   }
 
+  Future<int> getSum() async {
+    Database? db = await instance.database;
+    List<Map<String, dynamic>> result = await db!.query(table1, columns: ["SUM($columnAmount)"]);
+    int sum = result[0]["SUM($columnAmount)"] ?? 0;
+    return sum;
+  }
+
+
   /*
   Future<int> update(Map<String, dynamic> row) async {
     Database? db = await instance.database;

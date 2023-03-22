@@ -33,13 +33,31 @@ class _MyHomePageState extends State<MyHomePage> {
   int _investmentPool = 0;
   int _inputValue = 0;
 
-  void _addToPool() {
+  void _addToPool() async {
+
+    await LadgerDatabaseHelper.instance.insert({
+      LadgerDatabaseHelper.columnTransactionId: DateTime.now().millisecondsSinceEpoch,
+      LadgerDatabaseHelper.columnUser: 'user',
+      LadgerDatabaseHelper.columnAction: 1,
+      LadgerDatabaseHelper.columnAmount: _inputValue,
+      LadgerDatabaseHelper.columnDate: DateTime.now().toString(),
+    });
+
     setState(() {
       _investmentPool += _inputValue;
     });
   }
 
-  void _consumeFromPool() {
+  void _consumeFromPool() async {
+
+    await LadgerDatabaseHelper.instance.insert({
+      LadgerDatabaseHelper.columnTransactionId: DateTime.now().millisecondsSinceEpoch,
+      LadgerDatabaseHelper.columnUser: 'user',
+      LadgerDatabaseHelper.columnAction: 0,
+      LadgerDatabaseHelper.columnAmount: _inputValue,
+      LadgerDatabaseHelper.columnDate: DateTime.now().toString(),
+    });
+
     setState(() {
       if (_investmentPool - _inputValue >= 0) {
         _investmentPool -= _inputValue;
@@ -67,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Text(
               'Investment Pool: $_investmentPool円',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 20),
             TextField(
